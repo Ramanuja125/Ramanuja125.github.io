@@ -7,7 +7,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     /* ─── Variables ──────────────────────────────────────────── */
     :root {
@@ -26,7 +26,8 @@
       --white:      #e2e8f0;
       --muted:      #64748b;
       --sidebar-w:  230px;
-      --font:       'Inter', sans-serif;
+      --font:       'Space Grotesk', sans-serif;
+      --font-display: 'Russo One', sans-serif;
       --mono:       'JetBrains Mono', monospace;
     }
 
@@ -56,7 +57,7 @@
       display: flex;
       flex-direction: column;
       padding: 1.8rem 1rem;
-      z-index: 100;
+      z-index: 160;
       overflow-y: auto;
     }
     .sidebar-logo {
@@ -161,6 +162,25 @@
     }
     section:last-child { border-bottom: none; }
 
+    /* ── Scroll Reveal ── */
+    .reveal {
+      opacity: 0;
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .reveal.from-bottom { transform: translateY(40px); }
+    .reveal.from-left   { transform: translateX(-50px); }
+    .reveal.from-right  { transform: translateX(50px); }
+    .reveal.from-scale  { transform: scale(0.93); }
+    .reveal.visible {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .reveal.delay-1 { transition-delay: 0.1s; }
+    .reveal.delay-2 { transition-delay: 0.2s; }
+    .reveal.delay-3 { transition-delay: 0.3s; }
+    .reveal.delay-4 { transition-delay: 0.4s; }
+    .reveal.delay-5 { transition-delay: 0.5s; }
+
     .section-tag {
       font-family: var(--mono);
       font-size: 0.66rem;
@@ -170,6 +190,8 @@
       margin-bottom: 0.4rem;
     }
     .section-title {
+      font-family: var(--font-display);
+      font-weight: 400;
       font-size: 1.85rem;
       font-weight: 800;
       color: var(--white);
@@ -199,15 +221,40 @@
       margin-bottom: 0.7rem;
     }
     .hero-name {
-      font-size: clamp(2.2rem, 4vw, 3.6rem);
-      font-weight: 800;
-      line-height: 1.08;
+      font-size: clamp(2.4rem, 4.5vw, 4rem);
+      font-family: var(--font-display);
+      font-weight: 400;
+      line-height: 1.12;
       margin-bottom: 0.9rem;
+    }
+    .hero-greeting {
+      color: var(--muted);
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      display: block;
+      font-family: var(--font);
+      font-weight: 400;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.02em;
+    }
+    .typewriter-wrap {
       background: linear-gradient(130deg, #e2e8f0 30%, #00d4ff 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      display: inline;
     }
+    .cursor-blink {
+      display: inline-block;
+      width: 3px;
+      height: 0.85em;
+      background: var(--cyan);
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+      -webkit-text-fill-color: initial;
+      border-radius: 1px;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
     .pills { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.2rem; }
     .pill {
       padding: 0.22rem 0.75rem;
@@ -591,6 +638,14 @@
     .footer a:hover { text-decoration: underline; }
 
     /* ─── Mobile toggle ──────────────────────────────────────── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 149;
+    }
+    .sidebar-overlay.active { display: block; }
     .mob-toggle {
       display: none;
       position: fixed;
@@ -651,7 +706,8 @@
 </head>
 <body>
 
-<button class="mob-toggle" id="sidebarToggle">☰</button>
+<button class="mob-toggle" id="sidebarToggle" aria-label="Open navigation">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- ──────────── SIDEBAR ──────────── -->
 <nav class="sidebar" id="sidebar">
@@ -697,10 +753,13 @@
 <main class="main">
 
   <!-- ── ABOUT ── -->
-  <section id="about">
+  <section id="about" style="opacity:1;">
     <div class="hero-content">
       <div class="hero-eyebrow"></div>
-      <h1 class="hero-name">Ramanuja Magadi<br>Anantha Krishna</h1>
+      <h1 class="hero-name">
+        <span class="hero-greeting">Hi, I'm</span>
+        <span class="typewriter-wrap" id="tw-text"></span><span class="cursor-blink" id="tw-cursor"></span>
+      </h1>
       <div class="pills">
         <span class="pill pill-cyan">Data Scientist</span>
         <span class="pill pill-purple">Data Engineer</span>
@@ -750,14 +809,14 @@
 
   <!-- ── EXPERIENCE ── -->
   <section id="experience">
-    <div class="section-tag">// career</div>
+    <div class="section-tag reveal from-bottom">// career</div>
     <h2 class="section-title">Work Experience</h2>
     <p class="section-sub">Building production-grade systems across enterprise software and academia.</p>
 
     <div class="timeline">
 
       <!-- PROJECT HUMANITIES COMMENTED OUT — moved to Life & Activities
-      <div class="tl-item">
+      <div class="tl-item reveal from-left">
         <div class="tl-dot"></div>
         <div class="exp-card">
           <div class="exp-top">
@@ -773,14 +832,16 @@
       </div>
       -->
 
-      <div class="tl-item">
+      <div class="tl-item reveal from-left">
         <div class="tl-dot" style="background:var(--purple);box-shadow:0 0 8px var(--purple)"></div>
         <div class="exp-card">
           <div class="exp-top">
             <div class="exp-role">Associate Software Engineer</div>
             <div class="exp-date">Oct 2022 – Jun 2024</div>
           </div>
-          <div class="exp-co"><a href="https://www.informatica.com/" target="_blank">Informatica</a> · Bangalore, India &nbsp;·&nbsp; <em style="color:#475569">Cloud Data Integration &amp; Cloud Application Integration</em></div>
+          <div class="exp-co"><span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle;">
+              <svg width="18" height="18" viewBox="0 0 100 100" style="flex-shrink:0;"><polygon points="50,2 98,50 50,98 2,50" fill="#e65c00"/><polygon points="50,2 72,50 50,98 2,50" fill="#f47920"/><polygon points="50,2 98,50 72,50" fill="#f0a500"/><polygon points="38,42 60,42 54,60" fill="#1a5ce6"/></svg>
+            </span><a href="https://www.informatica.com/" target="_blank">Informatica</a> · Bangalore, India &nbsp;·&nbsp; <em style="color:#475569">Cloud Data Integration &amp; Cloud Application Integration</em></div>
           <ul class="exp-ul">
             <li>Worked 2.3 years on CDI and Cloud Application Integration — handling mappings, replication tasks, synchronization tasks, and taskflows; identified bottlenecks and bugs to optimize data flows for Fortune 500 enterprise clients across the US and Europe.</li>
             <li>Developed deep expertise in Informatica Secure Agent architecture and its connectivity to Oracle, SQL Server, MongoDB, MySQL, AWS S3 V2, Redshift, Snowflake, Azure, and Kafka.</li>
@@ -791,14 +852,16 @@
         </div>
       </div>
 
-      <div class="tl-item">
+      <div class="tl-item reveal from-left">
         <div class="tl-dot" style="background:var(--green);box-shadow:0 0 8px var(--green)"></div>
         <div class="exp-card">
           <div class="exp-top">
             <div class="exp-role">Software Engineering Intern</div>
             <div class="exp-date">Feb 2022 – Oct 2022</div>
           </div>
-          <div class="exp-co"><a href="https://www.informatica.com/" target="_blank">Informatica</a> · Bangalore, India</div>
+          <div class="exp-co"><span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle;">
+              <svg width="18" height="18" viewBox="0 0 100 100" style="flex-shrink:0;"><polygon points="50,2 98,50 50,98 2,50" fill="#e65c00"/><polygon points="50,2 72,50 50,98 2,50" fill="#f47920"/><polygon points="50,2 98,50 72,50" fill="#f0a500"/><polygon points="38,42 60,42 54,60" fill="#1a5ce6"/></svg>
+            </span><a href="https://www.informatica.com/" target="_blank">Informatica</a> · Bangalore, India</div>
           <ul class="exp-ul">
             <li>Gained hands-on experience with Cloud Data Integration including Secure Agent and diverse endpoints — Oracle, SQL Server, Snowflake, AWS S3 V2, Redshift — with full administrative privileges on Informatica, Salesforce, and Snowflake.</li>
             <li>Worked on transformations, taskflows, and schedulers covering on-prem databases, cloud endpoints, data warehouses, and ERP products like Salesforce and its objects.</li>
@@ -855,7 +918,7 @@
     <h2 class="section-title">Skills &amp; Technologies</h2>
     <p class="section-sub">Full-stack data science from raw pipelines to production AI.</p>
     <div class="skills-grid">
-      <div class="skill-card c-cyan">
+      <div class="skill-card c-cyan reveal from-left delay-1">
         <div class="skill-cat">Programming &amp; Query</div>
         <div class="tags">
           <span class="tag">Python</span><span class="tag">SQL</span><span class="tag">R</span>
@@ -864,7 +927,7 @@
           <span class="tag">PyTorch</span><span class="tag">Transformers</span>
         </div>
       </div>
-      <div class="skill-card c-purple">
+      <div class="skill-card c-purple reveal from-right delay-2">
         <div class="skill-cat">Machine Learning &amp; AI</div>
         <div class="tags">
           <span class="tag">Agentic AI</span><span class="tag">ReAct Agent</span>
@@ -876,7 +939,7 @@
           <span class="tag">Reinforcement Learning</span><span class="tag">MLOps</span>
         </div>
       </div>
-      <div class="skill-card c-red">
+      <div class="skill-card c-red reveal from-left delay-3">
         <div class="skill-cat">Networks &amp; Security</div>
         <div class="tags">
           <span class="tag">NIDS Evasion</span><span class="tag">Wireshark</span>
@@ -886,7 +949,7 @@
           <span class="tag">PCAP Analysis</span><span class="tag">Firebase Auth</span>
         </div>
       </div>
-      <div class="skill-card c-green">
+      <div class="skill-card c-green reveal from-right delay-4">
         <div class="skill-cat">Data Engineering</div>
         <div class="tags">
           <span class="tag">Apache Spark</span><span class="tag">Kafka</span>
@@ -896,7 +959,7 @@
           <span class="tag">SQL Server</span><span class="tag">ETL/ELT</span>
         </div>
       </div>
-      <div class="skill-card c-blue">
+      <div class="skill-card c-blue reveal from-left delay-5">
         <div class="skill-cat">Cloud &amp; DevOps</div>
         <div class="tags">
           <span class="tag">AWS (S3, EC2, Redshift)</span>
@@ -907,7 +970,7 @@
           <span class="tag">Git</span><span class="tag">GitHub Pages</span>
         </div>
       </div>
-      <div class="skill-card c-amber">
+      <div class="skill-card c-amber reveal from-right delay-5">
         <div class="skill-cat">Enterprise &amp; Visualization</div>
         <div class="tags">
           <span class="tag">Informatica CDI</span><span class="tag">IDMC</span>
@@ -1014,7 +1077,7 @@
       </a>
 
       <!-- 4 · NIDS (no link) -->
-      <div class="proj-card no-link">
+      <div class="proj-card reveal from-bottom no-link">
         <div class="proj-img" style="background:linear-gradient(135deg,#0d1010,#0a1210,#0d1512)">
           <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
             <rect x="10" y="22" width="38" height="36" rx="4" stroke="#00ff88" stroke-width="1.5" fill="none" opacity="0.6"/>
@@ -1175,7 +1238,7 @@
 
   <!-- ── RESUME ── -->
   <section id="resume">
-    <div class="section-tag">// document</div>
+    <div class="section-tag reveal from-bottom">// document</div>
     <h2 class="section-title">Resume</h2>
     <p class="section-sub">Download or view the full resume as a PDF.</p>
     <div class="resume-card">
@@ -1190,14 +1253,14 @@
 
   <!-- ── LIFE & ACTIVITIES ── -->
   <section id="life">
-    <div class="section-tag">// beyond the screen</div>
+    <div class="section-tag reveal from-bottom">// beyond the screen</div>
     <h2 class="section-title">Life &amp; Activities</h2>
     <p class="section-sub">Community, recognition, and miles logged on foot, wheel, and trail.</p>
 
     <div class="proj-grid">
 
       <!-- Project Humanities -->
-      <div class="proj-card no-link" style="cursor:default; grid-column: 1 / -1;">
+      <div class="proj-card reveal from-bottom no-link" style="cursor:default; grid-column: 1 / -1;">
         <div class="proj-img" style="background:linear-gradient(135deg,#050d1a,#071020,#060e1c); height:120px;">
           <svg width="280" height="100" viewBox="0 0 280 100" fill="none">
             <!-- Data pipeline visual -->
@@ -1236,7 +1299,7 @@
       </div>
 
       <!-- Homeless Outreach -->
-      <div class="proj-card no-link" style="cursor:default;">
+      <div class="proj-card reveal from-bottom no-link" style="cursor:default;">
         <div class="proj-img" style="background:linear-gradient(135deg,#0d1a10,#0a1a12,#0c1e14)">
           <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
             <circle cx="55" cy="28" r="12" stroke="#00ff88" stroke-width="1.5" fill="rgba(0,255,136,0.08)" opacity="0.9"/>
@@ -1262,7 +1325,7 @@
 
 
       <!-- Awards & Recognition -->
-      <div class="proj-card no-link" style="cursor:default;">
+      <div class="proj-card reveal from-bottom no-link" style="cursor:default;">
         <div class="proj-img" style="background:linear-gradient(135deg,#181005,#1a1208,#1e150a)">
           <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
             <polygon points="55,12 61,32 82,32 65,44 71,64 55,52 39,64 45,44 28,32 49,32" stroke="#f59e0b" stroke-width="1.5" fill="rgba(245,158,11,0.1)" opacity="0.85"/>
@@ -1282,7 +1345,7 @@
       </div>
 
       <!-- Saucony KOL -->
-      <div class="proj-card no-link" style="cursor:default;">
+      <div class="proj-card reveal from-bottom no-link" style="cursor:default;">
         <div class="proj-img" style="background:linear-gradient(135deg,#0d0818,#110c1e,#130d22)">
           <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
             <ellipse cx="55" cy="50" rx="35" ry="10" stroke="#a855f7" stroke-width="1" fill="none" opacity="0.4"/>
@@ -1304,7 +1367,7 @@
       </div>
 
       <!-- Running -->
-      <div class="proj-card no-link" style="cursor:default;">
+      <div class="proj-card reveal from-bottom no-link" style="cursor:default;">
         <div class="proj-img" style="background:linear-gradient(135deg,#1a1005,#1e1408,#1a130a)">
           <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
             <path d="M15 60 Q30 40 45 50 Q60 60 75 35 Q85 20 95 25" stroke="#f59e0b" stroke-width="2" fill="none" opacity="0.8"/>
@@ -1325,7 +1388,7 @@
       </div>
 
       <!-- Hiking -->
-      <div class="proj-card no-link" style="cursor:default;">
+      <div class="proj-card reveal from-bottom no-link" style="cursor:default;">
         <div class="proj-img" style="background:linear-gradient(135deg,#071510,#091a12,#0a1e14)">
           <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
             <polygon points="55,10 80,60 30,60" stroke="#00ff88" stroke-width="1.5" fill="rgba(0,255,136,0.06)" opacity="0.8"/>
@@ -1348,7 +1411,7 @@
       </div>
 
       <!-- Cycling -->
-      <div class="proj-card no-link" style="cursor:default;">
+      <div class="proj-card reveal from-bottom no-link" style="cursor:default;">
         <div class="proj-img" style="background:linear-gradient(135deg,#031418,#041a20,#051e24)">
           <svg width="110" height="80" viewBox="0 0 110 80" fill="none">
             <circle cx="32" cy="52" r="18" stroke="#00d4ff" stroke-width="1.5" fill="none" opacity="0.7"/>
@@ -1376,38 +1439,38 @@
 
   <!-- ── CONTACT ── -->
   <section id="contact">
-    <div class="section-tag">// get in touch</div>
+    <div class="section-tag reveal from-bottom">// get in touch</div>
     <h2 class="section-title">Contact</h2>
     <p class="section-sub">Feel free to reach out — always open to opportunities, collaborations, or just a good conversation.</p>
     <div class="contact-grid">
-      <a class="contact-card" href="tel:9782593434">
+      <a class="contact-card reveal from-scale" href="tel:9782593434">
         <div class="contact-icon" style="color:var(--cyan)">📞</div>
         <div class="contact-label">Phone</div>
         <div class="contact-val">(978) 259-3434</div>
       </a>
-      <a class="contact-card" href="mailto:anantharamanuja@gmail.com">
+      <a class="contact-card reveal from-scale" href="mailto:anantharamanuja@gmail.com">
         <div class="contact-icon" style="color:var(--purple)">✉️</div>
         <div class="contact-label">Email</div>
         <div class="contact-val">anantharamanuja@gmail.com</div>
       </a>
-      <a class="contact-card" href="https://www.linkedin.com/in/ramanuja-magadi-anantha-krishna/" target="_blank">
+      <a class="contact-card reveal from-scale" href="https://www.linkedin.com/in/ramanuja-magadi-anantha-krishna/" target="_blank">
         <div class="contact-icon" style="color:#0077b5">in</div>
         <div class="contact-label">LinkedIn</div>
         <div class="contact-val">ramanuja-magadi-anantha-krishna</div>
       </a>
-      <a class="contact-card" href="https://github.com/Ramanuja125" target="_blank">
+      <a class="contact-card reveal from-scale" href="https://github.com/Ramanuja125" target="_blank">
         <div class="contact-icon" style="color:var(--green)">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
         </div>
         <div class="contact-label">GitHub</div>
         <div class="contact-val">github.com/Ramanuja125</div>
       </a>
-      <a class="contact-card" href="https://www.facebook.com/ramanuja.magadi" target="_blank">
+      <a class="contact-card reveal from-scale" href="https://www.facebook.com/ramanuja.magadi" target="_blank">
         <div class="contact-icon" style="color:#1877f2">f</div>
         <div class="contact-label">Facebook</div>
         <div class="contact-val">ramanuja.magadi</div>
       </a>
-      <a class="contact-card" href="Ramanuja MA.pdf" target="_blank">
+      <a class="contact-card reveal from-scale" href="Ramanuja MA.pdf" target="_blank">
         <div class="contact-icon" style="color:var(--red)">📄</div>
         <div class="contact-label">Resume</div>
         <div class="contact-val">Download PDF</div>
@@ -1418,9 +1481,38 @@
   </div><!-- end page-wrap -->
 
   <script>
+    // ── Mobile sidebar toggle ──
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      sidebarToggle.textContent = '✕';
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      sidebarToggle.textContent = '☰';
+    }
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    // Close when a nav link is tapped on mobile
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 860) closeSidebar();
+      });
+    });
+
+    // ── Nav active state ──
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
-    const observer = new IntersectionObserver(entries => {
+    const navObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           navLinks.forEach(l => l.classList.remove('active'));
@@ -1429,7 +1521,35 @@
         }
       });
     }, { threshold: 0.3 });
-    sections.forEach(s => observer.observe(s));
+    sections.forEach(s => navObserver.observe(s));
+
+    // ── Typewriter ──
+    const fullName = "Ramanuja Magadi Anantha Krishna";
+    const twEl = document.getElementById('tw-text');
+    const cursor = document.getElementById('tw-cursor');
+    let i = 0;
+    function typeChar() {
+      if (i < fullName.length) {
+        twEl.textContent += fullName[i++];
+        setTimeout(typeChar, i < 4 ? 120 : 70);
+      } else {
+        // Done typing — cursor keeps blinking
+      }
+    }
+    setTimeout(typeChar, 600);
+
+    // ── Scroll Reveal (re-animates on each scroll) ──
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        } else {
+          entry.target.classList.remove('visible'); // reset when out of view
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(el => revealObserver.observe(el));
   </script>
 </body>
 </html>
